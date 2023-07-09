@@ -60,4 +60,8 @@ WHERE ProdactName LIKE 'Galaxy%';
 
 SELECT ProdactName,Manufacturer,ProductCount,Price
 FROM phone
+WHERE ProdactName REGEXP '[:digit:]' or Manufacturer REGEXP '[:digit:]';
+
+SELECT ProdactName,Manufacturer,ProductCount,Price
+FROM phone
 WHERE ProdactName LIKE '%8%' or Manufacturer LIKE '%8%';
