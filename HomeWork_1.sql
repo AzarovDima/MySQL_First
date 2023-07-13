@@ -2,7 +2,7 @@
 
 CREATE DATABASE IF NOT EXISTS HOMEWORK_1;
 USE HOMEWORK_1;
-
+DROP TABLES IF EXISTS phone;
 -- 1. Создаем таблицу по условию
 CREATE TABLE IF NOT EXISTS phone
 (
@@ -65,3 +65,19 @@ WHERE ProdactName REGEXP '[:digit:]' or Manufacturer REGEXP '[:digit:]';
 SELECT ProdactName,Manufacturer,ProductCount,Price
 FROM phone
 WHERE ProdactName LIKE '%8%' or Manufacturer LIKE '%8%';
+
+SELECT ProdactName, ProductCount,
+CASE
+	WHEN ProductCount = 1
+		THEN 'Товар заканчивается'
+	WHEN ProductCount = 2
+		THEN 'Мало товара'
+	WHEN ProductCount = 3
+		THEN 'Есть в наличии'
+	ELSE 'Много товара'
+END AS Category
+FROM phone;
+
+SELECT ProdactName, ProductCount,
+	IF (ProductCount > 3, 'Много товара', 'Мало товара')
+    FROM phone;
