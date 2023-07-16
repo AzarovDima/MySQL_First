@@ -43,9 +43,9 @@ LIMIT 5;
 
 SELECT
 	id,
-    salary,
     first_name,
-    last_name
+    last_name,
+    salary
 FROM staff
 ORDER BY last_name DESC, first_name DESC, salary;
 
