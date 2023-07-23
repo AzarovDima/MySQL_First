@@ -1,82 +1,90 @@
--- Создадим БД по таблице условия
-
-CREATE DATABASE IF NOT EXISTS Home_work_3;
-
-USE Home_work_3;
-DROP TABLE IF EXISTS staff;
-CREATE TABLE IF NOT EXISTS staff 
-(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-    first_name VARCHAR(45),
-    last_name VARCHAR(45),
-    post VARCHAR(45),
-    seniority INT,
-    salary DECIMAL(8,2), -- 100 000 . 00 - 8 - знаков всего, 2 - в дробной части
-    age INT
-);
-
-INSERT staff (first_name, last_name, post, seniority, salary, age)
-VALUES
-  ('Вася', 'Петров', 'Начальник', 40, 100000, 60),
-  ('Петр', 'Власов', 'Начальник', 8, 70000, 30),
-  ('Катя', 'Катина', 'Инженер', 2, 70000, 25),
-  ('Саша', 'Сасин', 'Инженер', 12, 50000, 35),
-  ('Иван', 'Петров', 'Рабочий', 40, 30000, 59),
-  ('Петр', 'Петров', 'Рабочий', 20, 55000, 60),
-  ('Сидр', 'Сидоров', 'Рабочий', 10, 20000, 35),
-  ('Антон', 'Антонов', 'Рабочий', 8, 19000, 28),
-  ('Юрий', 'Юрков', 'Рабочий', 5, 15000, 25),
-  ('Максим', 'Петров', 'Рабочий', 2, 11000, 19),
-  ('Юрий', 'Петров', 'Рабочий', 3, 12000, 24),
-  ('Людмила', 'Маркина', 'Уборщик', 10, 10000, 49);
-  SELECT * FROM staff;
-
-# 1. Отсортируйте данные по полю заработная плата (salary) в порядке: убывания; возрастания 
-SELECT
-	id,
-    salary,
-    CONCAT(first_name, ' ', last_name) AS full_name,
-    post,
-    seniority,
-    age
-FROM staff
-ORDER BY salary DESC; -- Без DESC будет по возрастанию
-# 2. Выведите 5 максимальных заработных плат (saraly)
-SELECT
-	id,
-	post,
-    salary
-FROM staff
-ORDER BY salary DESC
-LIMIT 5;
-# 3. Посчитайте суммарную зарплату (salary) по каждой специальности (роst)
-SELECT
-	post,
-    SUM(salary) AS sum_salary
-FROM staff
-GROUP BY post;
-# 4. Найдите кол-во сотрудников с специальностью (post) «Рабочий» в возрасте от 24 до 49 лет включительно.
-SELECT
-	post AS `Специальность`,
-    COUNT(*) AS `Кол-во рабочих`
-FROM staff
-WHERE post = "Рабочий" AND age >= 24 AND age <= 49;
-# 5. Найдите количество специальностей
-SELECT COUNT(DISTINCT post) AS `Кол-во специальностей` FROM staff;
-# 6. Выведите специальности, у которых средний возраст сотрудников меньше 30 лет 
-SELECT
-	post,
-    AVG(age) AS average_age
-FROM staff
-GROUP BY post
-HAVING AVG(age) <= 30 -- Условие наверно ошибка меньше со средним возрастом меньше 30 никого и нет! Есть ровно 30 )
-ORDER BY average_age;
-
--- Допник
-
 DROP DATABASE IF EXISTS lesson_4;
 CREATE DATABASE lesson_4;
 USE lesson_4;
+DROP TABLE IF EXISTS teacher;
+CREATE TABLE teacher
+(	
+	id INT NOT NULL PRIMARY KEY,
+    surname VARCHAR(45),
+    salary INT
+);
+
+INSERT teacher
+VALUES
+	(1,"Авдеев", 17000),
+    (2,"Гущенко",27000),
+    (3,"Пчелкин",32000),
+    (4,"Питошин",15000),
+    (5,"Вебов",45000),
+    (6,"Шарпов",30000),
+    (7,"Шарпов",40000),
+    (8,"Питошин",30000);
+    
+SELECT * from teacher; 
+DROP TABLE IF EXISTS lesson;
+CREATE TABLE lesson
+(	
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    course VARCHAR(45),
+    teacher_id INT,
+    FOREIGN KEY (teacher_id)  REFERENCES teacher(id)
+);
+INSERT INTO lesson(course,teacher_id)
+VALUES
+	("Знакомство с веб-технологиями",1),
+    ("Знакомство с веб-технологиями",2),
+    ("Знакомство с языками программирования",3),
+    ("Базы данных и SQL",4),
+    ("Нейронные сети", NULL); -- Учитель, который ведет данный предмет, временно отстутствует
+
+-- Вывести учителей и предметы, которые они ведут 
+SELECT 
+	t.surname AS "Фамилия", -- t = teacher
+    l.course AS "Название курса" -- l = lesson 
+FROM teacher t -- t = teacher, левая таблица 
+JOIN lesson l  -- INNER JOIN = JOIN (сокращенная)
+ON t.id = l.teacher_id;
+
+-- Вывести всех учителей, даже если они ничего не ведут 
+SELECT 
+	t.surname AS "Фамилия", -- t = teacher
+    l.course AS "Название курса" -- l = lesson 
+FROM teacher t -- t = teacher, левая таблица 
+LEFT JOIN lesson l  -- INNER JOIN = JOIN (сокращенная)
+ON t.id = l.teacher_id;
+
+SELECT 
+	t.surname AS "Фамилия", 
+	t.id,
+    l.teacher_id,
+    -- t = teacher
+    l.course AS "Название курса" -- l = lesson 
+FROM teacher t -- t = teacher, левая таблица 
+LEFT JOIN lesson l  -- INNER JOIN = JOIN (сокращенная)
+ON t.id = l.teacher_id
+WHERE l.teacher_id IS NULL;
+
+-- Учителя, которые ведут предмет "Знакомство с веб-технологиями" 
+SELECT 
+	t.surname AS "Фамилия", -- t = teacher
+    l.course AS "Название курса"-- l = lesson 
+FROM teacher t -- t = teacher, левая таблица 
+JOIN lesson l  -- INNER JOIN = JOIN (сокращенная)
+ON t.id = l.teacher_id
+WHERE l.course = "Знакомство с веб-технологиями";
+
+-- Вложенный SELECT 
+SELECT 
+	t.surname AS "Фамилия", -- t = teacher
+    web_lesson.* --  course, teacher_id
+FROM teacher t 
+JOIN (SELECT course, teacher_id FROM lesson
+WHERE course = "Знакомство с веб-технологиями") web_lesson
+ON t.id = web_lesson.teacher_id;
+
+DROP DATABASE IF EXISTS vk_db;
+CREATE DATABASE vk_db;
+USE vk_db;
 
 -- пользователи
 DROP TABLE IF EXISTS users;
@@ -284,12 +292,42 @@ INSERT INTO `profiles` (user_id, gender, birthday, photo_id, hometown) VALUES
 (7, 'm', '2014-07-31', NULL, 'South Jeffereyshire'),
 (8, 'f', '1975-03-26', 17, 'Howeside'),
 (9, 'f', '1982-11-01', 9, 'Loweborough'),
-(10, 'm', '1977-05-14', NULL, 'New Nellaside');
+(10, 'm', '1977-05-14', NULL, 'New Nellaside'); 
 
+
+-- Выборка данных по пользователю: ФИО, город, название файла 
 SELECT
-	user_id,
-    COUNT(filename LIKE '%.doc') AS `Документы .doc`,
-	COUNT(filename LIKE '%.docx') AS `Документы .docx`,
-	COUNT(filename LIKE '%.html') AS `Документы .html`
-FROM media
-GROUP BY user_id;
+	u.firstname,
+    u.lastname,
+    p.hometown AS city,
+    m.filename AS media_name
+FROM users u
+JOIN `profiles` p ON u.id = p.user_id 
+JOIN media m ON u.id = m.user_id;
+-- Выборка данных по пользователю: ФИО, город, название фотографии 
+SELECT
+	u.firstname,
+    u.lastname,
+    p.hometown AS city,
+    m.filename AS media_name
+FROM users u
+JOIN `profiles` p ON u.id = p.user_id 
+JOIN media m ON p.photo_id = m.id;
+
+-- Список медиафайлов конкретного человека с указанием количества лайков 
+-- и вывести ТОП-3 по популярности 
+USE vk_db;
+SELECT
+	u.firstname,
+    m.id,
+    u.lastname,
+	m.filename AS media_name,
+    COUNT(l.id) AS total_likes
+FROM media m
+JOIN users u ON u.id = m.user_id
+JOIN likes l ON l.media_id = m.id
+GROUP BY u.firstname
+ORDER BY total_likes DESC
+LIMIT 3;
+
+
